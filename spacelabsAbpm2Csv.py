@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import csv, sys, argparse
+import os, csv, sys, argparse
 
 COLUMN_DATE_RECORDED = 'Date recorded (Staff)'
 COLUMN_PATIENT_LAB_ID = 'Rec'
@@ -27,7 +27,7 @@ COLUMN_MEAN_NIGHTIME_DBP = 'Mean nightime DBP'
 def main(argv):
   parser = argparse.ArgumentParser()
   parser.add_argument("-o", "--outputfilename", required=True, help="Output filename")
-  parser.add_argument('files', nargs=argparse.REMAINDER)
+  parser.add_argument('directory')
   args = parser.parse_args()
 
   with open(args.outputfilename, 'w') as csvfile:
@@ -58,8 +58,10 @@ def main(argv):
 
     writer.writeheader()
 
-    for arg in args.files:
-      readCsv(arg, writer)
+    for root, dirs, files in os.walk(args.directory, topdown=False):
+      for name in files:
+        if (name.endswith('TXR')):
+          readCsv(os.path.join(root, name), writer)
 
 def readCsv(filename, output):
   print('Processing: ', filename)
